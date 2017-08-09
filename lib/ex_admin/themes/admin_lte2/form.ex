@@ -9,6 +9,7 @@ defmodule ExAdmin.Theme.AdminLte2.Form do
   import ExAdmin.Helpers
   import ExAdmin.Gettext
   alias ExAdmin.Schema
+  import ExAdmin.Form.Fields
 
   @doc false
   def build_form(conn, resource, items, params, script_block, global_script) do
@@ -220,17 +221,15 @@ defmodule ExAdmin.Theme.AdminLte2.Form do
                   required_abbr required
                 end
                 div ".col-sm-10" do
-                  select "##{ext_name}_#{f_name}#{error}.form-control", [name: name ] do
-                    for opt <- collection do
-                      cond do
-                        not is_nil(res) and (Map.get(res, f_name) == opt) ->
-                          option "#{opt}", [value: escape_value(opt), selected: :selected]
-                        true ->
-                          option "#{opt}", [value: escape_value(opt)]
-                      end
+                  binary_tuple = binary_tuple?(collection)
+                  markup do
+                    if binary_tuple do
+                      build_select_binary_tuple_list(collection, item, f_name, resource, model_name, ext_name)
+                    else
+                      input_collection(resource, collection, model_name, f_name, nil, nil, item, conn.params, error)
                     end
+                    build_errors(errors, item[:opts][:hint])
                   end
-                  build_errors(errors, field[:opts][:hint])
                 end
               end
             _ ->
@@ -309,6 +308,23 @@ defmodule ExAdmin.Theme.AdminLte2.Form do
             a ".btn.btn-default.remove_has_many_maps " <> (gettext "Delete"), href: "#"
           end
         end
+      end
+    end
+  end
+
+  defp build_select_binary_tuple_list(collection, item, field_name, resource, model_name, ext_name) do
+    html_opts = item[:opts][:html_opts] || []
+    html_opts = Keyword.merge([name: "#{model_name}[#{field_name}]"], html_opts)
+    select("##{ext_name}_id.form-control", html_opts) do
+      handle_prompt(field_name, item)
+      for item <- collection do
+        {value, name} = case item do
+          {value, name} -> {value, name}
+          other -> {other, other}
+        end
+        selected = if Map.get(resource, field_name) == value,
+          do: [selected: :selected], else: []
+        option(name, [value: value] ++ selected)
       end
     end
   end
