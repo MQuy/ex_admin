@@ -224,11 +224,11 @@ defmodule ExAdmin.Theme.AdminLte2.Form do
                   binary_tuple = binary_tuple?(collection)
                   markup do
                     if binary_tuple do
-                      build_select_binary_tuple_list(collection, item, f_name, resource, model_name, ext_name)
+                      build_select_binary_tuple_list(collection, field, f_name, res, base_name, ext_name)
                     else
-                      input_collection(resource, collection, model_name, f_name, nil, nil, item, conn.params, error)
+                      input_collection(res, collection, model_name, f_name, nil, nil, field, conn.params, error)
                     end
-                    build_errors(errors, item[:opts][:hint])
+                    build_errors(errors, field[:opts][:hint])
                   end
                 end
               end
