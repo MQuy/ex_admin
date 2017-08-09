@@ -328,4 +328,9 @@ defmodule ExAdmin.Theme.AdminLte2.Form do
       end
     end
   end
+
+  defp binary_tuple?([]), do: false
+  defp binary_tuple?(collection) do
+    Enum.all?(collection, &(is_binary(&1) or (is_tuple(&1) and (tuple_size(&1) == 2))))
+  end
 end
