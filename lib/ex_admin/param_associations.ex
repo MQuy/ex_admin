@@ -3,7 +3,10 @@ defmodule ExAdmin.ParamsAssociations do
   require Logger
 
   def load_associations(params, model_name, model, delete_association \\ true) do
-    params
+    case Map.has_key? params, model_name do
+      true -> Map.put(params, model_name, do_load_associations(params[model_name], model, delete_association))
+      false -> params
+    end
   end
 
   defp do_load_associations(params, _model, _delete_associations) do
